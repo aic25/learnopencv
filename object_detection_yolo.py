@@ -12,12 +12,13 @@ import os.path
 # Initialize the parameters
 confThreshold = 0.5  #Confidence threshold
 nmsThreshold = 0.4   #Non-maximum suppression threshold
-inpWidth = 416       #Width of network's input image
-inpHeight = 416      #Height of network's input image
+inpWidth = 320       #Width of network's input image
+inpHeight = 320      #Height of network's input image
 
 parser = argparse.ArgumentParser(description='Object Detection using YOLO in OPENCV')
 parser.add_argument('--image', help='Path to image file.')
 parser.add_argument('--video', help='Path to video file.')
+parser.add_argument('--output', type=bool, default=False, help="To produce output or not.")
 args = parser.parse_args()
         
 # Load names of classes
@@ -31,8 +32,8 @@ modelConfiguration = "yolov3.cfg";
 modelWeights = "yolov3.weights";
 
 net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
-net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
+net.setPreferableBackend(cv.dnn.DNN_BACKEND_DEFAULT)
+net.setPreferableTarget(cv.dnn.DNN_TARGET_OPENCL_FP16)
 
 # Get the names of the output layers
 def getOutputsNames(net):
@@ -121,7 +122,7 @@ elif (args.video):
     outputFile = args.video[:-4]+'_yolo_out_py.avi'
 else:
     # Webcam input
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(0+cv.CAP_V4L2)
 
 # Get the video writer initialized to save the output video
 if (not args.image):
@@ -137,8 +138,6 @@ while cv.waitKey(1) < 0:
         print("Done processing !!!")
         print("Output file is stored as ", outputFile)
         cv.waitKey(3000)
-        # Release device
-        cap.release()
         break
 
     # Create a 4D blob from a frame.

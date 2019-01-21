@@ -89,7 +89,7 @@ int main(int argc, char** argv)
             outputFile = str;
         }
         // Open the webcaom
-        else cap.open(parser.get<int>("device"));
+        else cap.open(parser.get<int>("device"), CAP_V4L2);
         
     }
     catch(...) {
